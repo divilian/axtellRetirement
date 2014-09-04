@@ -3,7 +3,7 @@ library(shiny)
 
 CLASSES.DIR <- "/tmp/classes"
 SIM.STATS.FILE <- "/tmp/sim_stats.csv"
-SIM.PARAMS.FILE <- "/tmp/sim_params.txt"
+SIM.PARAMS.FILE <- "/tmp/sim_paramsSIMTAG.txt"
 SIM.CLASS.NAME <- "edu.umw.shinysim.Sim"
 JAVA.RUN.TIME.OPTIONS <- ""
 
@@ -17,9 +17,10 @@ classpath <- paste("..","lib",libs,sep="/",collapse=":")
 #    to run.
 #  UI has a "seedType" radio which can be set to "specific" or "rand". If
 #    "specific" then a "seed" input will be set to contain an integer seed.
-#  Sim has other parameters, which will be represented in key value pairs in
-#    SIM.PARAMS.FILE once the sim starts. Each of these has an identically
-#    named input in the UI.
+#  Sim has other parameters, which it will write as key value pairs in
+#    a plain-text file called SIM.PARAMS.FILE once the sim starts. Each of 
+#    these parameters, other than simtag, has an identically named input in 
+#    the UI.
 #  Java simulation takes these parameters on command-line, with maxTime
 #    preceded immediately by "-maxTime" and simtag by "-tag".
 shinyServer(function(input,output,session) {
@@ -46,7 +47,7 @@ shinyServer(function(input,output,session) {
     
     get.param <- function(param.name) {
     
-        if (!file.exists(paste0(SIM.PARAMS.FILE,simtag))) {
+        if (!file.exists(sub("SIMTAG",simtag,".txt"))) {
             return(NA)
         }
         if (is.null(params)) {
@@ -55,10 +56,11 @@ shinyServer(function(input,output,session) {
             # 
             # seed=4592
             # maxTime=100
+            # simtag=932345
             # velocity=12.5
             # numGenerations=100
             #
-            the.df <- read.table(paste0(SIM.PARAMS.FILE,simtag),header=FALSE,
+            the.df <- read.table(sub("SIMTAG",simtag,".txt"),header=FALSE,
                 sep="=",stringsAsFactors=FALSE)
             params <<- setNames(the.df[[2]],the.df[[1]])
         }
@@ -92,6 +94,7 @@ shinyServer(function(input,output,session) {
                 # Add other simulation parameters here
                 input$simParam1,
                 "-maxTime",input$maxTime,
+                "-simtag",input$simtag,
                 ifelse(input$seedType=="specific",
                                             paste("-seed",input$seed),
                                             ""),
