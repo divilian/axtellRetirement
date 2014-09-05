@@ -1,15 +1,18 @@
 
 library(shiny)
+library(shinyIncubator)
 
-CLASSES.DIR <- "/tmp/classes"
-SIM.STATS.FILE <- "/tmp/sim_stats.csv"
+CLASSES.DIR <- "/tmp"
+SIM.STATS.FILE <- "/tmp/sim_statsSIMTAG.csv"
 SIM.PARAMS.FILE <- "/tmp/sim_paramsSIMTAG.txt"
 SIM.CLASS.NAME <- "edu.umw.shinysim.Sim"
 JAVA.RUN.TIME.OPTIONS <- ""
 
-libs <- c("mason.17.jar")
+LIBS <- c("mason.17.jar")
 
-classpath <- paste("..","lib",libs,sep="/",collapse=":")
+CLASSPATH <- paste(
+    paste("..","lib",LIBS,sep="/",collapse=":"),
+    CLASSES.DIR,sep=":")
 
 
 # Assumptions:
@@ -31,11 +34,11 @@ shinyServer(function(input,output,session) {
     params <- NULL
 
     sim.stats <- function() {
-        if (!file.exists(paste0(SIM.STATS.FILE,simtag))) {
+        if (!file.exists(sub("SIMTAG",simtag,SIM.STATS.FILE))) {
             return(data.frame())
         }
         tryCatch({
-            read.csv(paste0(SIM.STATS.FILE,simtag),header=TRUE,
+            read.csv(sub("SIMTAG",simtag,SIM.STATS.FILE),header=TRUE,
                 stringsAsFactors=FALSE)
         },error = function(e) return(data.frame())
         )
@@ -89,16 +92,16 @@ shinyServer(function(input,output,session) {
             if (!file.exists(CLASSES.DIR)) {
                 # Better compile, if we want to automatically do that.
             }
-            system(paste("nice java -classpath ",classpath,
+            system(paste("nice java -classpath ",CLASSPATH,
                 JAVA.RUN.TIME.OPTIONS,SIM.CLASS.NAME,
                 # Add other simulation parameters here
                 input$simParam1,
                 "-maxTime",input$maxTime,
-                "-simtag",input$simtag,
+                "-simtag",simtag,
                 ifelse(input$seedType=="specific",
                                             paste("-seed",input$seed),
                                             ""),
-                ">",paste0(SIM.STATS.FILE,simtag),"&"))
+                ">",sub("SIMTAG",simtag,SIM.STATS.FILE),"&"))
         })
     }
 

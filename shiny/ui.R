@@ -1,10 +1,11 @@
 
 library(shiny)
+library(shinyIncubator)
 
 APP.TITLE <- "Shiny Sim"
 
 
-shinyUI(pageWithSidebar(title=APP.TITLE,
+shinyUI(fluidPage(
 
     tags$head(tags$link(rel="stylesheet", type="text/css",
         href="shinysim.css")),
@@ -17,6 +18,8 @@ shinyUI(pageWithSidebar(title=APP.TITLE,
         h3("Simulation parameters"),
         fluidRow(
             # Insert input widgets for each sim parameter
+            numericInput("simParam1",label="Numeric multiplier",value=1,
+                min=0,max=10),
             radioButtons("seedType",label="",
                 choices=c("Random seed"="rand",
                     "Specific seed"="specific"),
@@ -26,7 +29,7 @@ shinyUI(pageWithSidebar(title=APP.TITLE,
                 numericInput("seed","Seed",value=0)),
             # May not always want to offer this choice
             numericInput("maxTime","Number of sim generations",
-                value=10,min=1,step=1)
+                value=10,min=1,step=1),
             actionButton("runsim",label="Run sim"),
             htmlOutput("log")
         )
