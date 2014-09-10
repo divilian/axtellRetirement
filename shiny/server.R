@@ -2,7 +2,8 @@
 library(shiny)
 library(shinyIncubator)
 
-CLASSES.DIR <- "/tmp"
+SOURCE.DIR <- "/home/stephen/research/shinysim"
+CLASSES.DIR <- "/tmp/classes"
 SIM.STATS.FILE <- "/tmp/sim_statsSIMTAG.csv"
 SIM.PARAMS.FILE <- "/tmp/sim_paramsSIMTAG.txt"
 SIM.CLASS.NAME <- "edu.umw.shinysim.Sim"
@@ -90,7 +91,12 @@ shinyServer(function(input,output,session) {
         # setwd("Do we need to be anywhere special to run this?")
         isolate({
             if (!file.exists(CLASSES.DIR)) {
-                # Better compile, if we want to automatically do that.
+                system(paste("mkdir",CLASSES.DIR))
+                system(paste("find",SOURCE.DIR,"-name \"*.java\" ",
+                    "> /tmp/javasourcefiles.txt"))
+                system(paste("javac -d",CLASSES.DIR,
+                    "@/tmp/javasourcefiles.txt"))
+                system("rm /tmp/javasourcefiles.txt")
             }
             system(paste("nice java -classpath ",CLASSPATH,
                 JAVA.RUN.TIME.OPTIONS,SIM.CLASS.NAME,
