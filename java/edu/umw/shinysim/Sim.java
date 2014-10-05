@@ -77,10 +77,15 @@ public class Sim {
         }
 
         // Write the output file to standard out.
-        System.out.println("Period,data");
-        for (int g=0; g<maxTime; g++) {
+        System.out.println("period,data");
+        for (int g=1; g<=maxTime; g++) {
             double nextStat = rng.nextDouble() * multiplicativeFactor;
             System.out.println(g + "," + nextStat);
+            System.out.flush();
+            try {
+                Thread.sleep(rng.nextInt(2000));
+            } catch (InterruptedException e) {
+            }
         }
     }
 

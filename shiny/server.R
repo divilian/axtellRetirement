@@ -8,6 +8,7 @@ SIM.STATS.FILE <- "/tmp/sim_statsSIMTAG.csv"
 SIM.PARAMS.FILE <- "/tmp/sim_paramsSIMTAG.txt"
 SIM.CLASS.NAME <- "edu.umw.shinysim.Sim"
 JAVA.RUN.TIME.OPTIONS <- ""
+REFRESH.PERIOD.MILLIS <- 500
 
 LIBS <- c("mason.17.jar")
 
@@ -27,6 +28,10 @@ CLASSPATH <- paste(
 #    the UI.
 #  Java simulation takes these parameters on command-line, with maxTime
 #    preceded immediately by "-maxTime" and simtag by "-tag".
+#  Java simulation produces a comma-separated output file called SIM.STATS.FILE
+#    which it writes to, perhaps slowly, with one line per period. The first
+#    column of this .csv is called "period" and is an integer ranging from 1
+#    to maxTime.
 shinyServer(function(input,output,session) {
 
     sim.started <- FALSE
@@ -76,15 +81,42 @@ shinyServer(function(input,output,session) {
         if (input$runsim < 1) return(NULL)
 
         isolate({
+            maxTime <- input$maxTime
             if (!sim.started) {
                 simtag <<- ceiling(runif(1,1,1e8))
                 cat("Starting sim",simtag,"\n")
-                progress <<- Progress$new(session,min=0,max=input$maxTime)
+                progress <<- Progress$new(session,min=0,max=maxTime+1)
                 progress$set(message="Launching simulation...",value=0)
                 start.sim(input,simtag)
+                progress$set(message="Initializing simulation...",value=1)
+                sim.started <<- TRUE
             }
-
         })
+
+        output$log <- renderText(HTML(paste0("<b>Log output:</b><br/>",
+            "sim #",simtag,"<br/>",
+            "seed: ",seed(),"<br/>")))
+
+        sim.stats.df <- sim.stats()
+        if (nrow(sim.stats.df) > 0) {
+            progress$set("Running simulation...",
+                detail=paste(max(sim.stats.df$period),"of",maxTime,
+                    "periods"),
+                value=1+max(sim.stats.df$period))
+            if (max(sim.stats.df$period) == maxTime) {
+                progress$set("Done.",value=1+maxTime)
+                sim.started <<- FALSE
+                progress$close()
+            } else {
+                # If the simulation is running, but not finished, check
+                # its progress again in a little bit.
+                invalidateLater(REFRESH.PERIOD.MILLIS,session)
+            }
+        } else {
+            # If the simulation isn't running yet, check its progress 
+            # again in a little bit.
+            invalidateLater(REFRESH.PERIOD.MILLIS,session)
+        }
     })
 
     start.sim <- function(input,simtag) {
