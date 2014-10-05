@@ -1,16 +1,58 @@
 
+# Shiny Sim. A template for displaying an analysis of a Java simulation (often
+# agent-based) in a Shiny Web-based interface.
+#
+# Stephen Davies, Ph.D. -- University of Mary Washington
+# 10/5/2014
+#
+# At a minimum, you will want to change everything marked CHANGE in this file
+# and in ui.R. You will often also want to change things marked OPTIONAL.
+#
+# Assumptions:
+#  The UI (defined in ui.R) has a "maxTime" input with the total number of 
+#    years/periods/generations for the sim to run.
+#  UI has a "seedType" radio button which can be set to "specific" or "rand".
+#    If "specific," then a "seed" input will be set to contain an integer seed.
+#  The sim has other parameters, many of which will probably be passed to it
+#    on the command-line, and which it will write as key value pairs in a 
+#    plain-text file called SIM.PARAMS.FILE once the sim starts. Each of these 
+#    parameters (other than simtag, which Shiny Sim generates on its own) has
+#    an identically named input in the UI.
+#  The Java simulation's command-line parameters include maxTime preceded 
+#    immediately by "-maxTime" and simtag preceded immediately by "-tag".
+#  As it runs, the sim produces a comma-separated output file called 
+#    SIM.STATS.FILE which it writes to, perhaps slowly, with one line per 
+#    period. The first column of this .csv is called "period" and is an 
+#    integer ranging from 1 to maxTime.
+
 library(shiny)
 library(shinyIncubator)
 
+
+# -------------------------------- Constants ---------------------------------
 SIM.FILES.BASE.DIR <- "/tmp"
+
+# CHANGE: The full path of your project directory. Any .java file that appears
+# in this directory hierarchy will be compiled as part of the simulation.
 SOURCE.DIR <- "/home/stephen/research/shinysim"
+
 CLASSES.DIR <- "/tmp/classes"
+
 SIM.STATS.FILE <- paste0(SIM.FILES.BASE.DIR,"/","sim_statsSIMTAG.csv")
+
 SIM.PARAMS.FILE <- paste0(SIM.FILES.BASE.DIR,"/","sim_paramsSIMTAG.txt")
+
+# CHANGE: The package/classname of the main() Java class in your sim.
 SIM.CLASS.NAME <- "edu.umw.shinysim.Sim"
+
 JAVA.RUN.TIME.OPTIONS <- ""
+
+# OPTIONAL: The rate (number of milliseconds between refreshes) at which the
+# web app will read the simulator's output file for progress to update plots
+# and such.
 REFRESH.PERIOD.MILLIS <- 500
 
+# OPTIONAL: Any Java libraries needed by the simulation.
 LIBS <- c("mason.17.jar")
 
 CLASSPATH <- paste(
@@ -18,21 +60,8 @@ CLASSPATH <- paste(
     CLASSES.DIR,sep=":")
 
 
-# Assumptions:
-#  UI has a "maxTime" input with number of years/periods/generations for sim
-#    to run.
-#  UI has a "seedType" radio which can be set to "specific" or "rand". If
-#    "specific" then a "seed" input will be set to contain an integer seed.
-#  Sim has other parameters, which it will write as key value pairs in
-#    a plain-text file called SIM.PARAMS.FILE once the sim starts. Each of 
-#    these parameters, other than simtag, has an identically named input in 
-#    the UI.
-#  Java simulation takes these parameters on command-line, with maxTime
-#    preceded immediately by "-maxTime" and simtag by "-tag".
-#  Java simulation produces a comma-separated output file called SIM.STATS.FILE
-#    which it writes to, perhaps slowly, with one line per period. The first
-#    column of this .csv is called "period" and is an integer ranging from 1
-#    to maxTime.
+
+# ------------------------- The Shiny Sim server -----------------------------
 shinyServer(function(input,output,session) {
 
     sim.started <- FALSE
@@ -40,6 +69,9 @@ shinyServer(function(input,output,session) {
     simtag <- 0     # A hashtag we'll create for each particular sim run.
     params <- NULL
 
+
+    # Return a data frame containing the most recent contents of the 
+    # SIM.STATS.FILE.
     sim.stats <- function() {
         if (!file.exists(sub("SIMTAG",simtag,SIM.STATS.FILE))) {
             return(data.frame())
@@ -54,10 +86,16 @@ shinyServer(function(input,output,session) {
         )
     }
 
+
+    # Return the seed, as recorded in the SIM.PARAMS.FILE.
     seed <- function() {
         get.param("seed")
     }
     
+
+    # Return the value of the named parameter, as recorded in the 
+    # SIM.PARAMS.FILE. Often (but not always) this will have been passed to
+    # the sim via command-line argument, after being retrieved from the UI.
     get.param <- function(param.name) {
     
         if (!file.exists(sub("SIMTAG",simtag,SIM.PARAMS.FILE))) {
@@ -80,6 +118,8 @@ shinyServer(function(input,output,session) {
         return(params[[param.name]])
     }
 
+
+    # Shiny Observer to start the simulation when the button is pressed.
     observe({
         if (input$runsim < 1) return(NULL)
 
@@ -122,6 +162,8 @@ shinyServer(function(input,output,session) {
         }
     })
 
+
+    # Start a new instance of the Java simulation.
     start.sim <- function(input,simtag) {
         setwd(SIM.FILES.BASE.DIR)
         isolate({
@@ -135,7 +177,8 @@ shinyServer(function(input,output,session) {
             }
             system(paste("nice java -classpath ",CLASSPATH,
                 JAVA.RUN.TIME.OPTIONS,SIM.CLASS.NAME,
-                # Add other simulation parameters here
+                # CHANGE: Add any other simulation parameters required on the
+                # Java command-line here.
                 input$simParam1,
                 "-maxTime",input$maxTime,
                 "-simtag",simtag,
@@ -146,9 +189,12 @@ shinyServer(function(input,output,session) {
         })
     }
 
+
+    # CHANGE: put any graphics commands to produce a visual analysis of the
+    # simulation's output here.
     output$analysis1Plot <- renderPlot({
-        # A simple plot, showing the field called "data" in the .csv versus
-        # the period number. Put here any awesome analysis you like.
+        # This boilerplate is a simple plot, showing the field called "data" 
+        # in the .csv versus the period number.
         if (input$runsim < 1) return(NULL)
         sim.stats.df <- sim.stats()
         if (nrow(sim.stats.df) > 0) {
@@ -164,6 +210,8 @@ shinyServer(function(input,output,session) {
         invalidateLater(REFRESH.PERIOD.MILLIS,session)
     })
 
+
+    # Nuke any sims that are still currently running.
     kill.all.sims <- function() {
         system(paste("pkill -f",SIM.CLASS.NAME))
     }
