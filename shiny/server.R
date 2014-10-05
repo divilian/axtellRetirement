@@ -2,10 +2,11 @@
 library(shiny)
 library(shinyIncubator)
 
+SIM.FILES.BASE.DIR <- "/tmp"
 SOURCE.DIR <- "/home/stephen/research/shinysim"
 CLASSES.DIR <- "/tmp/classes"
-SIM.STATS.FILE <- "/tmp/sim_statsSIMTAG.csv"
-SIM.PARAMS.FILE <- "/tmp/sim_paramsSIMTAG.txt"
+SIM.STATS.FILE <- paste0(SIM.FILES.BASE.DIR,"/","sim_statsSIMTAG.csv")
+SIM.PARAMS.FILE <- paste0(SIM.FILES.BASE.DIR,"/","sim_paramsSIMTAG.txt")
 SIM.CLASS.NAME <- "edu.umw.shinysim.Sim"
 JAVA.RUN.TIME.OPTIONS <- ""
 REFRESH.PERIOD.MILLIS <- 500
@@ -56,7 +57,7 @@ shinyServer(function(input,output,session) {
     
     get.param <- function(param.name) {
     
-        if (!file.exists(sub("SIMTAG",simtag,".txt"))) {
+        if (!file.exists(sub("SIMTAG",simtag,SIM.PARAMS.FILE))) {
             return(NA)
         }
         if (is.null(params)) {
@@ -69,8 +70,8 @@ shinyServer(function(input,output,session) {
             # velocity=12.5
             # numGenerations=100
             #
-            the.df <- read.table(sub("SIMTAG",simtag,".txt"),header=FALSE,
-                sep="=",stringsAsFactors=FALSE)
+            the.df <- read.table(sub("SIMTAG",simtag,SIM.PARAMS.FILE),
+                header=FALSE,sep="=",stringsAsFactors=FALSE)
             params <<- setNames(the.df[[2]],the.df[[1]])
         }
         
@@ -120,7 +121,7 @@ shinyServer(function(input,output,session) {
     })
 
     start.sim <- function(input,simtag) {
-        # setwd("Do we need to be anywhere special to run this?")
+        setwd(SIM.FILES.BASE.DIR)
         isolate({
             if (!file.exists(CLASSES.DIR)) {
                 system(paste("mkdir",CLASSES.DIR))
