@@ -28,7 +28,7 @@ shinyUI(fluidPage(
             conditionalPanel(condition="input.seedType == 'specific'",
                 numericInput("seed","Seed",value=0)),
             # May not always want to offer this choice
-            numericInput("maxTime","Number of sim generations",
+            numericInput("maxTime","Number of sim periods",
                 value=10,min=1,step=1),
             actionButton("runsim",label="Run sim"),
             htmlOutput("log")

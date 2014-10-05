@@ -71,7 +71,6 @@ shinyServer(function(input,output,session) {
             # maxTime=100
             # simtag=932345
             # velocity=12.5
-            # numGenerations=100
             #
             the.df <- read.table(sub("SIMTAG",simtag,SIM.PARAMS.FILE),
                 header=FALSE,sep="=",stringsAsFactors=FALSE)
@@ -154,9 +153,10 @@ shinyServer(function(input,output,session) {
         sim.stats.df <- sim.stats()
         if (nrow(sim.stats.df) > 0) {
             the.plot <- ggplot(sim.stats.df,aes(x=period,y=data)) + 
-                geom_line() + 
+                geom_line(color="blue") + 
                 scale_x_continuous(limits=c(1,isolate(input$maxTime)),
                                     breaks=1:isolate(input$maxTime)) +
+                expand_limits(y=0)
                 labs(title="Data",x="Sim period")
             print(the.plot)
         }
