@@ -45,7 +45,10 @@ shinyServer(function(input,output,session) {
             return(data.frame())
         }
         tryCatch({
+            # Change the colClasses argument here, if desired, to control the
+            # classes used for each of the data columns.
             read.csv(sub("SIMTAG",simtag,SIM.STATS.FILE),header=TRUE,
+                colClasses=c("integer", "numeric"),
                 stringsAsFactors=FALSE)
         },error = function(e) return(data.frame())
         )
@@ -143,6 +146,23 @@ shinyServer(function(input,output,session) {
                 ">",sub("SIMTAG",simtag,SIM.STATS.FILE),"&"))
         })
     }
+
+    output$analysis1Plot <- renderPlot({
+        # A simple plot, showing the field called "data" in the .csv versus
+        # the period number. Put here any awesome analysis you like.
+        if (input$runsim < 1) return(NULL)
+        sim.stats.df <- sim.stats()
+        if (nrow(sim.stats.df) > 0) {
+            the.plot <- ggplot(sim.stats.df,aes(x=period,y=data)) + 
+                geom_line() + 
+                scale_x_continuous(limits=c(1,isolate(input$maxTime)),
+                                    breaks=1:isolate(input$maxTime)) +
+                labs(title="Data",x="Sim period")
+            print(the.plot)
+        }
+        # Recreate this plot in a little bit.
+        invalidateLater(REFRESH.PERIOD.MILLIS,session)
+    })
 
     kill.all.sims <- function() {
         system(paste("pkill -f",SIM.CLASS.NAME))
