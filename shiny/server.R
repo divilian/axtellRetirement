@@ -20,10 +20,13 @@
 #    an identically named input in the UI.
 #  The Java simulation's command-line parameters include maxTime preceded 
 #    immediately by "-maxTime" and simtag preceded immediately by "-tag".
-#  As it runs, the sim produces a comma-separated output file called 
-#    SIM.STATS.FILE which it writes to, perhaps slowly, with one line per 
-#    period. The first column of this .csv is called "period" and is an 
-#    integer ranging from 1 to maxTime.
+#  As it runs, the sim writes comma-separated output to standard out, perhaps
+#    slowly, with one line per period. The first row of this output is a
+#    comma-separated header, giving title to the columns. The first column of 
+#    the output is titled "period" and is an integer ranging from 1 to maxTime.
+#  The Java simulation requires only the .jar files in LIBS, below, in its
+#    CLASSPATH, and those .jar files are in a "lib" subdirectory immediately
+#    underneath the project directory.
 
 library(shiny)
 library(shinyIncubator)
@@ -56,7 +59,7 @@ REFRESH.PERIOD.MILLIS <- 500
 LIBS <- c("mason.17.jar")
 
 CLASSPATH <- paste(
-    paste("..","lib",LIBS,sep="/",collapse=":"),
+    paste(SOURCE.DIR,"lib",LIBS,sep="/",collapse=":"),
     CLASSES.DIR,sep=":")
 
 
@@ -165,16 +168,16 @@ shinyServer(function(input,output,session) {
 
     # Start a new instance of the Java simulation.
     start.sim <- function(input,simtag) {
-        setwd(SIM.FILES.BASE.DIR)
         isolate({
             if (!file.exists(CLASSES.DIR)) {
                 system(paste("mkdir",CLASSES.DIR))
                 system(paste("find",SOURCE.DIR,"-name \"*.java\" ",
                     "> /tmp/javasourcefiles.txt"))
                 system(paste("javac -d",CLASSES.DIR,
-                    "@/tmp/javasourcefiles.txt"))
+                    "-cp",CLASSPATH,"@/tmp/javasourcefiles.txt"))
                 system("rm /tmp/javasourcefiles.txt")
             }
+            setwd(SIM.FILES.BASE.DIR)
             system(paste("nice java -classpath ",CLASSPATH,
                 JAVA.RUN.TIME.OPTIONS,SIM.CLASS.NAME,
                 # CHANGE: Add any other simulation parameters required on the
