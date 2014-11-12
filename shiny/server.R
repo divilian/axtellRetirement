@@ -209,8 +209,10 @@ shinyServer(function(input,output,session) {
                 labs(title="Data",x="Sim period")
             print(the.plot)
         }
-        # Recreate this plot in a little bit.
-        invalidateLater(REFRESH.PERIOD.MILLIS,session)
+        if (sim.started) {
+            # Recreate this plot in a little bit.
+            invalidateLater(REFRESH.PERIOD.MILLIS,session)
+        }
     })
 
 
