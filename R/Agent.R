@@ -3,6 +3,7 @@ library(methods)
 
 source("parameters.R")
 
+
 #############################################################################
 # Agent class. An agent is an individual who, if not already retired, will
 # decide whether to retire. This is the abstract superclass of all specific
@@ -17,9 +18,11 @@ Agent <- setRefClass("Agent",
     methods = list(
         initialize=function(...) {
             if (is.null(list(...)$age)) {
-                stop("Agent not initialized with age.")
+                cat("Agent not initialized with age; assuming 0.\n")
+                age <<- 0
+            } else {
+                age <<- list(...)$age
             }
-            age <<- list(...)$age
             death.age <<- sample(DEATH.AGE.RANGE[1]:DEATH.AGE.RANGE[2],1)
             state <<- "working"
         }
