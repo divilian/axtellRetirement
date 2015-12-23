@@ -46,14 +46,17 @@ public class Sim {
             printUsageAndQuit();
         }
 
+        // (Standard parameters expected to be common to all Shiny Sims)
+        int maxTime = Integer.valueOf(args[2]);
+        long simtag = Long.valueOf(args[4]);
+        long seed = System.currentTimeMillis();
+        // WARNING: if you set the seed this way, you need to add "-seed seed"
+        // to the args array, so that when it is passed to doLoop(), doLoop()
+        // is forced to use that seed instead of making its own.
+        
+        // (An example parameter for this silly demo)
         double multiplicativeFactor = Double.valueOf(args[0]);
 
-        int maxTime = Integer.valueOf(args[2]);
-
-        long simtag = Long.valueOf(args[4]);
-
-        long seed = System.currentTimeMillis();
-        
         if (args.length >= 7) {
             seed = Long.valueOf(args[6]);
         }
@@ -87,6 +90,28 @@ public class Sim {
             } catch (InterruptedException e) {
             }
         }
+
+        /*
+         * MASON users: the easiest way to run your simulation from here is:
+         * 1) Have your main model class inherit from SimState (I call it
+         * "Model" in the example code below)
+         * 2) Make that model class a singleton, with an instance() method
+         * 3) Give your main model class some public static variables that
+         * represent the sim parameters, and set those (as below)
+         * 4) Call doLoop on the Model directly from here, passing it a new
+         * MakesSimState (as below).
+         *
+         * Model.PARAM_NUMBER_ONE = multiplicativeFactor;
+         * Model.PARAM_NUMBER_TWO = someOtherSimSpecificParameter;
+         * Model.doLoop(new MakesSimState() {
+         *     public SimState newInstance(long seed, String[] args) {
+         *         return Model.instance();
+         *     }
+         *     public Class simulationClass() {
+         *         return Model.class;
+         *     }
+         * }, args);
+         */
     }
 
     private static void printUsageAndQuit() {
