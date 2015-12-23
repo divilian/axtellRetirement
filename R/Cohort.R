@@ -3,9 +3,7 @@ library(methods)
 
 source("parameters.R")
 
-if (!exists("Agent")) {
-    source("Agent.R")
-}
+source("Agent.R")
 
 
 #############################################################################
