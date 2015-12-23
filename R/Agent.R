@@ -67,4 +67,23 @@ RandomAgent$methods(decide.whether.to.retire=function() {
 })
 
 
-stephen <- RandomAgent$new(retirement.probability=.3,age=46)
+
+
+#############################################################################
+# RationalAgent class. A RationalAgent always retires as soon as possible.
+
+RationalAgent <- setRefClass("RationalAgent",
+    contains="Agent",
+    fields = list(),
+    methods = list(
+        initialize=function(...) { 
+            callSuper(...)
+        }
+    )
+)
+
+RationalAgent$methods(decide.whether.to.retire=function() {
+    return(age >= AGE.OF.RETIREMENT.ELIGIBILITY)
+})
+
+
