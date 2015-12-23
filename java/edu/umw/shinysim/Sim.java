@@ -50,6 +50,9 @@ public class Sim {
         int maxTime = Integer.valueOf(args[2]);
         long simtag = Long.valueOf(args[4]);
         long seed = System.currentTimeMillis();
+        // WARNING: if you set the seed this way, you need to add "-seed seed"
+        // to the args array, so that when it is passed to doLoop(), doLoop()
+        // is forced to use that seed instead of making its own.
         
         // (An example parameter for this silly demo)
         double multiplicativeFactor = Double.valueOf(args[0]);
