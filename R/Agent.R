@@ -60,18 +60,18 @@ print.Agent <- function(x, ...) {
 RandomAgent <- setRefClass("RandomAgent",
     contains="Agent",
     fields = list(
-        retirement.probability="numeric"
+        retirement.prob="numeric"
     ),
     methods = list(
-        initialize=function(retirement.probability=0, ...) { 
+        initialize=function(retirement.prob=RANDOM.AGENTS.RET.PROB, ...) { 
             callSuper(...)
-            retirement.probability <<- retirement.probability
+            retirement.prob <<- retirement.prob
         }
     )
 )
 
 RandomAgent$methods(decide.whether.to.retire=function() {
-    return(runif(1) < retirement.probability)
+    return(runif(1) < retirement.prob)
 })
 
 
