@@ -18,7 +18,6 @@ Agent <- setRefClass("Agent",
     methods = list(
         initialize=function(...) {
             if (is.null(list(...)$age)) {
-                cat("Agent not initialized with age; assuming 0.\n")
                 age <<- 0
             } else {
                 age <<- list(...)$age

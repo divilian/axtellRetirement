@@ -29,7 +29,6 @@ SocialNetwork$methods(get.possible.influencers = function() {
     # (Stupidest technique ever. What's the right way to do this?)
     for (i in length(poss.i):1) {
         if (identical(poss.i[[i]], owner)) {
-            cat("Removing element",i,"!\n")
             poss.i <- poss.i[-i]
         }
     }
