@@ -113,3 +113,16 @@ ImitativeAgent$methods(decide.whether.to.retire=function() {
     return(TRUE)
 })
 
+
+
+#############################################################################
+# Factory method for generating agents.
+
+agent.types <- c(rational=RationalAgent, imitative=ImitativeAgent,
+    random=RandomAgent)
+
+generate.agent <- function(age=0) {
+    probabilities <- cumsum(AGENT.FREQUENCIES)
+    class <- agent.types[[which(runif(1) < probabilities)[1]]]
+    class$new(age=age)
+}
