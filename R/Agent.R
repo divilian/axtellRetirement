@@ -23,7 +23,7 @@ Agent <- setRefClass("Agent",
             } else {
                 age <<- list(...)$age
             }
-            death.age <<- sample(DEATH.AGE.RANGE[1]:DEATH.AGE.RANGE[2],1)
+            death.age <<- sample(DEATH.AGE.RANGE,1)
             state <<- "working"
         }
     )
