@@ -47,4 +47,9 @@ SocialNetwork$methods(initialize=function(...) {
             min(c(num.influencers,length(possible.influencers))))
     }
 })
-    
+
+print.SocialNetwork <- function(x, ...) {
+    print(paste0("A social network of ", length(x$influencers), 
+        " influencing agents (extent ", x$extent, ")"))
+    invisible(x)
+}
