@@ -44,6 +44,11 @@ Agent$methods(decide.whether.to.retire=function() {
     stop("Abstract method decide.whether.to.retire() called.")
 })
 
+print.Agent <- function(x, ...) {
+    print(paste0(x$age,"-year old ",x$state," agent (will die at ",
+        x$death.age,")"))
+    invisible(x)
+}
 
 
 
