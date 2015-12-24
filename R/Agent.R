@@ -14,7 +14,8 @@ Agent <- setRefClass("Agent",
         age="numeric", 
         death.age="numeric", 
         state="character", # should be factor(c("working","retired","dead")).
-        social.network="envRefClass"  # avoid infinite recursion "bug"
+        social.network="envRefClass", # avoid infinite recursion "bug"
+        printable.type="character"
     ),
     methods = list(
         initialize=function(...) {
@@ -45,8 +46,8 @@ Agent$methods(decide.whether.to.retire=function() {
 })
 
 print.Agent <- function(x, ...) {
-    print(paste0(x$age,"-year old ",x$state," agent (will die at ",
-        x$death.age,")"))
+    print(paste0(x$age,"-year old ",x$state," ", x$printable.type, 
+        " (will die at ", x$death.age,")"))
     invisible(x)
 }
 
@@ -66,6 +67,7 @@ RandomAgent <- setRefClass("RandomAgent",
         initialize=function(retirement.prob=RANDOM.AGENTS.RET.PROB, ...) { 
             callSuper(...)
             retirement.prob <<- retirement.prob
+            printable.type <<- "RandomAgent"
         }
     )
 )
@@ -86,6 +88,7 @@ RationalAgent <- setRefClass("RationalAgent",
     methods = list(
         initialize=function(...) { 
             callSuper(...)
+            printable.type <<- "RationalAgent"
         }
     )
 )
@@ -105,6 +108,7 @@ ImitativeAgent <- setRefClass("ImitativeAgent",
     methods = list(
         initialize=function(...) { 
             callSuper(...)
+            printable.type <<- "ImitativeAgent"
         }
     )
 )
