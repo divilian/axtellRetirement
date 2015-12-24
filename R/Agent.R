@@ -13,7 +13,8 @@ Agent <- setRefClass("Agent",
     fields = list(
         age="numeric", 
         death.age="numeric", 
-        state="character" # should be factor(c("working","retired","dead")).
+        state="character", # should be factor(c("working","retired","dead")).
+        social.network="envRefClass"  # avoid infinite recursion "bug"
     ),
     methods = list(
         initialize=function(...) {
