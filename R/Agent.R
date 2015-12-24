@@ -95,3 +95,21 @@ RationalAgent$methods(decide.whether.to.retire=function() {
 })
 
 
+
+#############################################################################
+# ImitativeAgent class.  (Stubbed.)
+
+ImitativeAgent <- setRefClass("ImitativeAgent",
+    contains="Agent",
+    fields = list(),
+    methods = list(
+        initialize=function(...) { 
+            callSuper(...)
+        }
+    )
+)
+
+ImitativeAgent$methods(decide.whether.to.retire=function() {
+    return(TRUE)
+})
+
