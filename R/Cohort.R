@@ -34,4 +34,8 @@ Cohort$methods(num.agents=function() length(members))
 
 
 
+print.Cohort <- function(x, ...) {
+    print(paste0("A cohort of ", length(x$members), " ", x$age,"-year olds"))
+    invisible(x)
+}
 
