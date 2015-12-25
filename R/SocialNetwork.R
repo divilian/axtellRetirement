@@ -53,7 +53,12 @@ SocialNetwork$methods(get.number.in.states = function(states) {
 })
 
 SocialNetwork$methods(get.number.eligible.to.retire = function() {
-    return(get.number.in.states(c("working","retired")))
+    sum(sapply(influencers, 
+        function(agent) {
+            agent$state %in% c("working","retired")  &&  
+            agent$age >= AGE.OF.RETIREMENT.ELIGIBILITY
+        }
+    ))
 })
 
 SocialNetwork$methods(get.number.retired = function() {
