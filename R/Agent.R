@@ -100,21 +100,24 @@ RationalAgent$methods(decide.whether.to.retire=function() {
 
 
 #############################################################################
-# ImitativeAgent class.  (Stubbed.)
+# ImitativeAgent class. An ImitativeAgent decides to retire based on whether
+# the fraction of eligible retirees in its SocialNetwork that are retired is
+# above its imitation threshold.
 
 ImitativeAgent <- setRefClass("ImitativeAgent",
     contains="Agent",
-    fields = list(),
+    fields = list(imitation.threshold="numeric"),
     methods = list(
         initialize=function(...) { 
             callSuper(...)
+            imitation.threshold <<- IMITATION.THRESHOLD  # homogeneous
             printable.type <<- "ImitativeAgent"
         }
     )
 )
 
 ImitativeAgent$methods(decide.whether.to.retire=function() {
-    return(TRUE)
+    return(social.network$fraction.retired.of.eligible() > imitation.threshold)
 })
 
 
