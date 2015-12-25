@@ -20,7 +20,6 @@ initialize.cohorts <- function() {
     for (age in SPAWN.AGE.RANGE) {
         all.cohorts[[age]]$fill(AGENTS.PER.COHORT)
     }
-    invisible(TRUE)
 }
 
 advance.cohorts <- function() {
@@ -37,7 +36,6 @@ initialize.social.networks <- function() {
             agent$social.network <- SocialNetwork$new(owner=agent)
         })
     })
-    invisible(TRUE)
 }
 
 
@@ -49,5 +47,4 @@ retirement <- function() {
     initialize.cohorts()   # (which also initializes agents.)
     initialize.social.networks()
 
-    invisible(TRUE)
 }
