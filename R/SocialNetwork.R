@@ -48,16 +48,16 @@ SocialNetwork$methods(initialize=function(...) {
     }
 })
 
-SocialNetwork$methods(get.number.in.state = function(a.state) {
-    sum(sapply(influencers, function(agent) agent$state == a.state))
+SocialNetwork$methods(get.number.in.states = function(states) {
+    sum(sapply(influencers, function(agent) agent$state %in% states))
 })
 
 SocialNetwork$methods(get.number.eligible.to.retire = function() {
-    return(get.number.in.state("working"))
+    return(get.number.in.states(c("working","retired")))
 })
 
 SocialNetwork$methods(get.number.retired = function() {
-    return(get.number.in.state("retired"))
+    return(get.number.in.states("retired"))
 })
 
 SocialNetwork$methods(fraction.retired.of.eligible = function() {
