@@ -48,6 +48,22 @@ SocialNetwork$methods(initialize=function(...) {
     }
 })
 
+SocialNetwork$methods(get.number.in.state = function(a.state) {
+    sum(sapply(influencers, function(agent) agent$state == a.state))
+})
+
+SocialNetwork$methods(get.number.eligible.to.retire = function() {
+    return(get.number.in.state("working"))
+})
+
+SocialNetwork$methods(get.number.retired = function() {
+    return(get.number.in.state("retired"))
+})
+
+SocialNetwork$methods(fraction.retired.of.eligible = function() {
+    return(get.number.retired() / get.number.eligible.to.retire())
+})
+
 print.SocialNetwork <- function(x, ...) {
     print(paste0("A social network of ", length(x$influencers), 
         " influencing agents (extent ", x$extent, ")"))
